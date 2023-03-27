@@ -32,7 +32,7 @@ struct xpc_j337 {
 
 kern_return_t getAmfid() {
     // We will need an XPC service to try getting the amfid pid and build a ripped amfid service
-    const char* amfid_xpc = "com.apple.backboard.TouchDeliveryPolicyServer";
+    const char* amfid_xpc = "com.apple.MobileFileIntegrity";
 
     printf("We will be triggering some special sausage to make them drop the amfid???\n");
 
